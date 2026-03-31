@@ -1,0 +1,30 @@
+# ── Build artifacts ───────────────────────────────────────────
+target/
+
+# ── Secrets — must NEVER be baked into the image ─────────────
+.env
+.env.*
+*.pem
+*.key
+
+# ── IDE / OS noise ────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+
+# ── Git ───────────────────────────────────────────────────────
+.git/
+.gitignore
+.gitattributes
+
+# ── Maven wrapper JAR (fetched at build time anyway) ─────────
+.mvn/wrapper/maven-wrapper.jar
+
+# ── Documentation (not needed at runtime) ────────────────────
+*.md
+DEPLOYMENT.md
+HELP.md

@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: diagram-generator
+  config:
+    import: optional:file:.env[.properties]
+
+  # Datasource (activate when DB is connected)
+  # datasource:
+  #   url: ${DB_URL}
+  #   username: ${DB_USERNAME}
+  #   password: ${DB_PASSWORD}
+  #   driver-class-name: org.postgresql.Driver
+
+  # JPA
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: validate
+  #   show-sql: false
+
+# Gemini AI
+app:
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    timeout-seconds: ${GEMINI_TIMEOUT_SECONDS:30}
+    max-output-tokens: ${GEMINI_MAX_TOKENS:4096}
+    temperature: ${GEMINI_TEMPERATURE:0.7}
+
+  rate-limit:
+    capacity: ${RATE_LIMIT_CAPACITY:20}
+    refill-tokens: ${RATE_LIMIT_REFILL_TOKENS:20}
+    refill-duration-seconds: ${RATE_LIMIT_REFILL_SECONDS:60}
+
+server:
+  port: ${SERVER_PORT:8080}

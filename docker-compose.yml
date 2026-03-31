@@ -1,0 +1,51 @@
+services:
+  diagram-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: diagram-generator:latest
+    container_name: diagram-generator
+
+    ports:
+      - "8080:8080"
+
+    # ── Secret injection ──────────────────────────────────────
+    # .env is read by Docker at startup and injected as real OS
+    # environment variables. The file itself is NEVER copied into
+    # the image (see .dockerignore). Spring Boot picks up every
+    # ${VARIABLE} reference in application.yml from these vars.
+    env_file:
+      - .env
+
+    environment:
+      # Forward-header strategy: tells Tomcat's RemoteIpValve to
+      # rewrite getRemoteAddr() from X-Forwarded-For so our
+      # RateLimitFilter sees the real client IP even behind a
+      # reverse proxy (Nginx / Traefik / Cloudflare).
+      #
+      # SECURITY NOTE: only enable NATIVE when this container is
+      # placed behind a trusted proxy. If exposed directly to the
+      # internet, remove this line to prevent IP spoofing.
+      - SERVER_FORWARD_HEADERS_STRATEGY=NATIVE
+
+    restart: unless-stopped
+
+    # ── Health check ─────────────────────────────────────────
+    # Polls the root path; Spring Boot serves the static index.html
+    # there. Adjust if you add Spring Actuator later.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/ > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+    # ── Resource limits ───────────────────────────────────────
+    # Prevents a runaway JVM from consuming all host memory.
+    # The JVM's -XX:MaxRAMPercentage=75 will cap heap at ~384 MB.
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 256m
